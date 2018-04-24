@@ -2,12 +2,20 @@ const nodeFetch = require('node-fetch'),
   h = require('highland'),
   urlUtil = require('url'),
   { getComponentInstance, replaceVersion } = require('clayutils'),
-  CLAY_ACCESS_KEY = process.env.CLAY_ACCESS_KEY_LOCAL;
+  CLAY_ACCESS_KEY = process.env.CLAY_ACCESS_KEY_LOCAL,
+  AMPHORA_IP = '127.0.0.1';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-function streamFetch() {
-  return h(nodeFetch.apply(this, arguments));
+function streamFetch(url, options) {
+  const { hostname } = urlUtil.parse(url);
+
+  url = url.replace(hostname, AMPHORA_IP);
+  options = options || {};
+  options.headers = options.headers || {};
+  options.headers['x-forwarded-host'] = hostname;
+
+  return h(nodeFetch(url, options));
 }
 
 function streamFetchJson() {
@@ -74,17 +82,19 @@ function commitAsset(asset) {
   })
 }
 
-// streamClayAssets('http://nymag.com/betamale/_pages')
-//   .tap(asset => console.log('checking', asset.uri))
-//   .filter(asset => getComponentInstance(asset.data.layout) === 'coral')
-//   .tap(h.log)
-//   .done(process.exit);
-
-function replaceLayoutInSite(ip, site, fromLayout, toLayout) {
+/**
+ * Replaces all refs to a given layout to another layout in all pages of a
+ * given site.
+ * @param {string} site e.g. 'https://www.thecut.com'
+ * @param {string} fromLayout e.g. 'www.thecut.com/_layout/instances/foo'
+ * @param {string} toLayout 'www.thecut.com/_layout/instances/bar'
+ * @return {Stream}
+ */
+function replaceLayoutInSite(site, fromLayout, toLayout) {
   const fromPublished = replaceVersion(fromLayout, 'published'),
     toPublished = replaceVersion(toLayout, 'published');
 
-  return streamClayAssets(`${site}_pages`)
+  return streamClayAssets(`${site}/_pages`)
     // .tap(asset => console.log('checking', asset.uri))
     .filter(asset => asset.data.layout === fromLayout ||
       asset.data.layout === fromPublished
@@ -96,13 +106,13 @@ function replaceLayoutInSite(ip, site, fromLayout, toLayout) {
 
 /**
  * Lists all page assets from a site that have the specified layout.
- * @param {*} site 
- * @param {*} layout 
+ * @param {string} site e.g.'www.thecut.com/_layout/instances/foo'
+ * @param {string} layout e.g. 'www.thecut.com/_layout/instances/foo'
  */
 function report(site, layout) {
   const publishedLayout = replaceVersion(layout, 'published');
 
-  return streamClayAssets(`${site}_pages`)
+  return streamClayAssets(`${site}/_pages`)
     .filter(asset => asset.data.layout === layout ||
       asset.data.layout === publishedLayout
     )
@@ -113,9 +123,8 @@ function logResult(i) {
   console.log(JSON.stringify(i));
 }
 
-
 replaceLayoutInSite(
-  'localhost.thecut.com',
-  'localhost.thecut.com/_components/layout/instances/article',
-  'localhost.thecut.com/_components/layout/instances/article2'
+  'https://localhost.thecut.com',
+  'localhost.thecut.com/_components/layout/instances/article2',
+  'localhost.thecut.com/_components/layout/instances/article'
 ).tap(logResult).done(process.exit);
