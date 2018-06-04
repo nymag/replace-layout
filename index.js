@@ -3,7 +3,7 @@ const nodeFetch = require('node-fetch'),
   urlUtil = require('url'),
   { getComponentInstance, replaceVersion, getComponentVersion } = require('clayutils'),
   CLAY_ACCESS_KEY = process.env.CLAY_ACCESS_KEY_PROD,
-  // AMPHORA_IP = '127.0.0.1';
+  // AMPHORA_IP = '127.0.0.1'
   AMPHORA_IP = '172.24.16.82'; // clay00
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -144,18 +144,12 @@ function logResult(result) {
   console.log(JSON.stringify(result));
 }
 
-/** Example
 replaceLayoutInSite(
-  'http://www.thecut.com',
+  'http://www.grubstreet.com',
   {
-    "www.thecut.com/_components/layout/instances/article-talk": "www.thecut.com/_components/layout/instances/article",
-    "www.thecut.com/_components/layout/instances/feature-article-talk": "www.thecut.com/_components/layout/instances/feature-article",
-    "www.thecut.com/_components/one-column-layout/instances/article-talk": "www.thecut.com/_components/one-column-layout/instances/article",
-    "www.thecut.com/_components/one-column-layout/instances/feature-article-talk": "www.thecut.com/_components/one-column-layout/instances/feature-article",
-    "www.thecut.com/_components/one-column-layout/instances/feature-cover-story-talk": "www.thecut.com/_components/one-column-layout/instances/feature-cover-story",
-    "www.thecut.com/_components/one-column-layout/instances/feature-horizontal-talk": "www.thecut.com/_components/one-column-layout/instances/feature-horizontal",
-    "www.thecut.com/_components/one-column-layout/instances/interactive-article-talk": "www.thecut.com/_components/one-column-layout/instances/interactive-article"
+    "www.grubstreet.com/_components/layout/instances/talk": "www.grubstreet.com/_components/layout/instances/article"
 
   }
 ).tap(logResult).done(process.exit);
-**/
+
+// report('http://www.grubstreet.com', 'www.grubstreet.com/_components/layout/instances/talk').done(process.exit);
