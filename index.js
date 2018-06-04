@@ -116,7 +116,7 @@ function replaceLayoutInSite(site, replacements) {
 
 /**
  * Lists all page assets from a site that have the specified layout.
- * @param {string} site e.g.'www.thecut.com/_layout/instances/foo'
+ * @param {string} site e.g.'www.thecut.com'
  * @param {string} layout e.g. 'www.thecut.com/_layout/instances/foo'
  */
 function report(site, layout) {
